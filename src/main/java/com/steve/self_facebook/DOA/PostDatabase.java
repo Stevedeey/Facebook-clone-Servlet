@@ -59,10 +59,6 @@ public class PostDatabase {
                 post.setImageName(result.getString("image_name"));
                 post.setName(result.getString("lastname"));
                 posts.add(post);
-                System.out.println(post.getBody());
-                System.out.println(post.getImageName());
-                System.out.println(post.getTitle());
-                System.out.println(post.getId());
 
             }
         }catch (Exception e){

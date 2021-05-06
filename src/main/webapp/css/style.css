@@ -6,11 +6,11 @@ html{
 }
 
 body{
-    background: #242527;
+    background: #6985bd !important;
     color: #fff;
 }
 nav{
-    background: #242527;
+    background: #ddd !important;
 }
 
 #header_search_query{

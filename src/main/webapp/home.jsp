@@ -52,8 +52,8 @@
 
 <!-- ============================================================================================================== -->
 
-<nav class="navbar navbar-expand-lg navbar-success bg-dark">
-    <div class="container-fluid">
+<nav class="navbar navbar-expand-lg navbar-success bg-dark" >
+    <div class="container-fluid" >
         <a class="navbar-brand" href="#">Facebook</a>
         <form class="d-flex">
             <input

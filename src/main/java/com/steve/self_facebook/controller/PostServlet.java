@@ -31,7 +31,7 @@ public class PostServlet extends HttpServlet {
 
             //fetch data from post form
             Part part = request.getPart("file");
-            System.out.println(part);
+
            String imageName = part.getSubmittedFileName();
 
             String title = request.getParameter("title");
@@ -47,10 +47,8 @@ public class PostServlet extends HttpServlet {
 
             //get file part
             String path = "/Users/mac/IdeaProjects/facebook/src/main/webapp/image" + File.separator + imageName;
-            System.out.println(path);
 
             InputStream in = part.getInputStream();
-
             boolean success = uploadFile(in, path);
 
             if (success) {

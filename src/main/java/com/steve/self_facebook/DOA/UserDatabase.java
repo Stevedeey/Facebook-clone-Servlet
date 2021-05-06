@@ -32,7 +32,8 @@ public class UserDatabase {
             success = true;
             //test the effect of these close
             preparedStatement.close();
-            this.con.close();
+            System.out.println("I entered here");
+//            this.con.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
