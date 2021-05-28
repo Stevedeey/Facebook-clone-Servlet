@@ -39,11 +39,42 @@ body{
     width: 100%;
     height: 50px;
 }
-@media(min-width:768px)
-{
-    .removepost{
+
+@media(min-width:768px) {
+    .removepost {
         margin-left: -80px;
 
     }
-
 }
+
+
+@media(min-width:768px)
+{
+footer {
+    position: relative;
+    width: 100%;
+    background-color: #ffffff;
+    color: #7188b5;
+    bottom: 0px;
+    margin-top: 25px;
+    margin-bottom: -10px;
+}
+}
+
+footer{
+    text-align: center;
+    font-size: 18px;
+}
+footer p {
+    word-spacing: 10px;
+    width: 75%;
+    margin: auto;
+    cursor: pointer;
+}
+
+footer > .copyright {
+    margin-top: 8px;
+    margin-bottom: 15px;
+    word-spacing: 0px;
+}
+

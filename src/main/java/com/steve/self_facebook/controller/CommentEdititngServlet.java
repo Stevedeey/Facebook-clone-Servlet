@@ -10,8 +10,8 @@ import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet(name = "DeleteServlet", value = "/DeleteServlet")
-public class DeleteServlet extends HttpServlet {
+@WebServlet(name = "CommentEdititngServlet", value = "/CommentEdititngServlet")
+public class CommentEdititngServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -19,28 +19,23 @@ public class DeleteServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try(PrintWriter out = response.getWriter()) {
-           response.setContentType("text/plain");
-           response.setCharacterEncoding("UTF-8");
+        try(PrintWriter out = response.getWriter();) {
+            HttpSession httpSession = request.getSession();
+            response.setContentType("text/plain");
+            response.setCharacterEncoding("UTF-8");
+            //postId
             int postId = Integer.parseInt(request.getParameter("postId"));
-           //Do something here
-            HttpSession session = request.getSession();
-          User user =  (User)session.getAttribute("user");
-//            int userId = user.getId();
-//            System.out.println("Post Id is here "+postId);
+            String comment = request.getParameter("editedComment");
+            //int userId = Integer.parseInt(request.getParameter("userId"));
+            User user = (User) httpSession.getAttribute("user");
 
             PostDatabase postDatabase = new PostDatabase(ConnectionManager.getConnection());
 
-            if(postDatabase.deletePost(user.getId(), postId)){
-               // out.println("Post Deleted Succesfully");
-                response.getWriter().write("Post deleted succesfully");
+            if(postDatabase.editComment(user.getId(), postId, comment)){
+                response.getWriter().write("Success editing post");
             }else{
-
-                response.getWriter().write("Access denied deleting this post");
+                response.getWriter().write("Error editing post or you don't have access to delete this comment");
             }
-
-           // response.sendRedirect("home.jsp");
-
         }catch (Exception e){
             e.printStackTrace();
         }

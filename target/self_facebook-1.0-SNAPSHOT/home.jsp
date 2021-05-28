@@ -34,15 +34,17 @@
 </head>
 <body>
 <%
+    User user = (User) session.getAttribute("user");
     PostDatabase postData = new PostDatabase(ConnectionManager.getConnection());
-    List<Post> posts = postData.getPosts();
+    List<Post> posts = postData.getPosts(user);
+    System.out.println(posts);
 
     if(session.getAttribute("message") != null){%>
 <div class="alert alert-primary" role="alert">
     <%=session.getAttribute("message").toString()%>
 </div>
 <%}
-    User user = (User) session.getAttribute("user");
+
 
     if(user == null){
         session.setAttribute("Registration Error", "!!!Please Login first");
@@ -52,7 +54,7 @@
 
 <!-- ============================================================================================================== -->
 
-<nav class="navbar navbar-expand-lg navbar-success bg-dark" >
+<nav class="navbar navbar-expand-lg navbar-success bg-dark " >
     <div class="container-fluid" >
         <a class="navbar-brand" href="#">Facebook</a>
         <form class="d-flex">
@@ -128,13 +130,13 @@
         </div>
     </div>
 </nav>
-<div class="container-fluid">
+<div class="container-fluid fix">
     <div class="row">
         <div class="col-lg-3">
             <div class="fix">
                 <div>
-                    <img src="./image/dipson.jepg" class="pix" alt="" />
-                    <p class="yourfeed"><%=user.getFirstname() +" "+ user.getLastname() %> Show</p>
+                    <img src="./image/dipson.jpeg"  class="pix" alt="" />
+                    <p class="yourfeed"><%=user.getFirstname() +" "+ user.getLastname() %> </p>
                 </div>
                 <div class="yourfeed1">
                     <img src="./image/love.png " class="pictures" alt="" />
@@ -189,44 +191,53 @@
             </div>
         </div>
         <div class="col-lg-6">
+<%--            Start Pagination--%>
             <div class="scroller like-icon">
                 <%
-                    for (Post each:posts) {%>
+                    for (Post post:posts) {%>
+
                 <div class="linear">
                     <div class="titleText">
-                        <h2><%=each.getTitle()%></h2>
-                        <p><span style="font-weight: bold; color:#81adef; font-size: 1.4em;margin-right: 5px">Author:</span>
-                            <%=each.getName()%></p>
+
+                        <p><span style="font-weight: bold; color:#81adef; font-size: 1.4em; margin-right: 5px">Original Poster:</span>
+                            <%=post.getName()%></p>
+                        <h2><%=post.getTitle()%></h2>
                     </div>
-                    <img src="./image/<%=each.getImageName()%>" class="majorpix" alt="" />
+                    <img src="./image/<%=post.getImageName()%>" class="majorpix" alt="" />
                 </div>
                 <div class="body">
-                    <p><%=each.getBody()%></p>
+                    <p><%=post.getBody()%></p>
                 </div>
                 <hr>
                 <div class="comment_like_share mb-2">
                     <div class="like">
-                        <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                        <i  onclick="like(<%=post.getId()%>, <%=user.getId()%>)" id="<%=post.getId()%>"
+                            class="fa fa-thumbs-o-up" aria-hidden="true">
+                            <span class="likes"><%=post.getNoLikes()%></span>
+                            <span style="display:none;" class="thumb"><%=post.getId()%></span></i>
+                        <p style="display: none" class="userLiked"><%=post.isLikedPost()%></p>
+
+                        </i>
                         <!-- <span>Like</span> -->
                     </div>
                     <div class="comment">
-                        <i class="fa fa-commenting-o" aria-hidden="true" onclick="com(<%=each.getId()%>)"></i>
-
+                        <i class="fa fa-commenting-o" aria-hidden="true" onclick="com(<%=post.getId()%>)"></i>
+                        <span style="font-size: 30px;"><%=post.getNoComments()%>
                         <!-- <span>Comment</span> -->
                     </div>
                     <div class="edit">
-                        <i class="fa fa-edit" aria-hidden="true" onclick="edit(<%=each.getId()%>)">
+                        <i class="fa fa-edit" aria-hidden="true" onclick="edit(<%=post.getId()%>)">
                         </i>
                         <!-- <span>Edit</span> -->
                     </div>
                     <div class="delete">
-                        <i class="fa fa-remove" aria-hidden="true" id="delete" onclick="del(<%=each.getId()%>)"></i>
+                        <i class="fa fa-remove" aria-hidden="true" id="delete" onclick="del(<%=post.getId()%>)"></i>
                         <!-- <span>Delete</span> -->
                     </div>
                 </div>
                 <div class="row mb-2">
                     <form action="/CommentServlet" method="POST">
-                        <input style="display:none" name="postId" value="<%=each.getId()%>"/>
+                        <input style="display:none" name="postId" value="<%=post.getId()%>"/>
                         <textarea
                                 name="comment"
                                 class="form-control drag"
@@ -240,7 +251,11 @@
                 <%}
                 %>
             </div>
+         <a href="view.jsp?page=1">1</a>
+          <a href="view.jsp?page=2">2</a>
+         <a href="view.jsp?page=3">3</a>
         </div>
+        <%--            The second column ends here--%>
         <div class="col-lg-3 third">
             <div class="postArea">
                 <form action="/PostServlet" method="POST" enctype="multipart/form-data">
@@ -299,19 +314,101 @@
 <script src="https://use.fontawesome.com/aed9ef824b.js"></script>
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
+
+
+    window.onload = () => {
+        const valid = document.getElementsByClassName("userLiked");
+        let thumb = document.getElementsByClassName("fa fa-thumbs-o-up");
+
+
+        for (let i = 0; i < valid.length; i++) {
+
+            if(valid[i].innerHTML === "true") {
+                thumb[i].style.color = "#1977f2";
+            }
+        }
+    }
+
     //edit post
     function edit(postId){
-        console.log("working now");
         window.location.href = "/edit.jsp?post="+postId;
     }
 
+    //comment on post
     function com(postId){
-        console.log("working now");
         window.location.href = "/comment.jsp?post="+postId;
     }
 
-    //delete post
+    //like on post
+    function like(postId, userId){
+        //fa fa-thumbs-o-up
+        const URL = "/LikeServlet";
+        let like = document.getElementById(postId).style.color;
+      //  console.log(like);
+
+        if(like == "rgb(25, 119, 242)"){
+
+           // console.log("decrement");
+            const valid = document.getElementsByClassName("thumb");
+            document.getElementById(postId).style.color = "#000";
+
+            for (let i = 0; i < valid.length; i++) {
+                let newId = valid[i].innerHTML.split(" ")[0]; //the spliting later was not necessary
+
+                if(newId == postId){
+                    let like = Number(document.getElementsByClassName("likes")[i].innerHTML);
+                    like--;
+                    document.getElementsByClassName("likes")[i].innerHTML = like+"";
+                    console.log( document.getElementsByClassName("likes")[i]);
+
+                    const data = {postId, userId, "action": 0}
+                    ajaxCall(URL, data);
+                }
+            }
+        }else{
+            console.log("increment");
+
+            const valid = document.getElementsByClassName("thumb");
+            document.getElementById(postId).style.color = "#1977f2";
+
+            for (let i = 0; i < valid.length; i++) {
+                let newId = valid[i].innerHTML.split(" ")[0];
+
+                if(newId == postId){
+                    let like = Number(document.getElementsByClassName("likes")[i].innerHTML);
+                    like++;
+                    document.getElementsByClassName("likes")[i].innerHTML = like+"";
+
+                    const data = {
+                         postId,
+                         userId,
+                        "action": 1
+                    }
+                    ajaxCall(URL, data);
+                }
+            }
+        }
+    }
+
+    function ajaxCall(url, dataCall){
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: dataCall,
+
+            success: function(data){
+
+            },
+            error: function(){
+                alert('error liking');
+            }
+        });
+    }
+
+    // delete post
     function del(postId){
+        console.log("working");
+
         const delPost = confirm("Are you sure you want to delete post");
 
         if(delPost){
@@ -322,19 +419,16 @@
 
                 success: function(data){
                     console.log(data);
-                    alert("Post Successfully deleted");
-
-                    if(del)
-                        //location.href = "/home.jsp";
-                        window.location.reload();
+                    alert(data);
+                    window.location.reload();
                 },
                 error: function(){
                     alert('error deleting post');
                 }
             });
-
         }
     }
+
 </script>
 <!-- =============================================================================================================== -->
 <!-- =============================================================================================================== -->

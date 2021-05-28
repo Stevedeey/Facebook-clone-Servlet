@@ -1,4 +1,7 @@
-<%--
+<%@ page import="com.steve.self_facebook.model.User" %>
+<%@ page import="com.steve.self_facebook.DOA.PostDatabase" %>
+<%@ page import="com.steve.self_facebook.model.Post" %>
+<%@ page import="com.steve.self_facebook.utilities.ConnectionManager" %><%--
   Created by IntelliJ IDEA.
   User: mac
   Date: 5/5/21
@@ -32,6 +35,19 @@
     ></script>
 </head>
 <body>
+<%
+    User user = (User) session.getAttribute("user");
+    if(user == null){
+        session.setAttribute("Registration Error", "!!!Please Login first");
+        response.sendRedirect("index.jsp");
+    }
+    String query = request.getQueryString();
+    int postId = Integer.parseInt(query.substring(query.indexOf("=")+1));
+    PostDatabase postDatabase = new PostDatabase(ConnectionManager.getConnection());
+    Post post = postDatabase.getPostById(postId);
+    System.out.println(post);
+%>
+
 <nav style="background: #3b5998" class="navbar navbar-expand-lg">
     <div class="container-fluid">
         <a class="navbar-brand" href="#" style="color:#fff;"><h1>Facebook</h1></a>
@@ -57,17 +73,19 @@
     <form action="/UpdateServlet" method="POST">
         <div class="mb-3">
             <label for="title" class="form-label">Post Title</label>
-            <input type="text" class="form-control" id="title" name="title" aria-describedby="emailHelp">
+            <input type="text" class="form-control" id="title" value="<%=post.getTitle()%>" name="title" aria-describedby="emailHelp">
             <div class="form-text">Edit title</div>
         </div>
         <div class="mb-3">
             <label for="body" class="form-label">Post Body</label>
-            <input type="text" class="form-control" id="body" name="body" aria-describedby="emailHelp">
+            <input type="text" class="form-control" id="body" name="body" value="<%=post.getBody()%>" aria-describedby="emailHelp">
             <div class="form-text">Edit body</div>
         </div>
         <label for="body" class="form-label">Post id</label>
         <input id="input" type="text" name="postId"/>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary"
+        <%if(!post.getEmail().equals(user.getEmail()))%> disabled
+        >Submit</button>
     </form>
 </section>
 <script>

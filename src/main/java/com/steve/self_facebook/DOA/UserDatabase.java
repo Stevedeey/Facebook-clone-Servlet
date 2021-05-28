@@ -1,12 +1,12 @@
 package com.steve.self_facebook.DOA;
 
 import com.steve.self_facebook.model.User;
+import com.steve.self_facebook.utilities.ConnectionManager;
 import com.steve.self_facebook.utilities.Encryption;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDatabase {
     private Connection con;
@@ -15,7 +15,13 @@ public class UserDatabase {
         this.con = con;
     }
     //Registration
-    public boolean saveUser(User user){
+
+    /**
+     * Allows users to register
+     * @param user
+     * @return
+     */
+    public boolean registerUser(User user){
         boolean success = false;
         String query = "INSERT INTO user(firstname, lastname,password, email, dob, gender) VALUES(?,?,?,?,?,?)";
 
@@ -27,13 +33,20 @@ public class UserDatabase {
             preparedStatement.setString(4, user.getEmail());
             preparedStatement.setString(5,user.getDob());
             preparedStatement.setString(6,user.getGender());
-
             preparedStatement.executeUpdate();
             success = true;
-            //test the effect of these close
+//
+////            if(loadUser(user.getEmail())!=null)
+////            {getEmail
+//                success = false;
+//        //    }
+//            else{
+//
+//
+//            }
+
             preparedStatement.close();
-            System.out.println("I entered here");
-//            this.con.close();
+
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -41,10 +54,17 @@ public class UserDatabase {
 
     }
 
-    public User logUser(String data, String password){
+    /**
+     * This method allows user to login
+     * @param data
+     * @param password
+     * @return
+     */
+    public User login(String data, String password){
         User user = null;
         try {
            String query = "select * from user where email=?";
+           Connection connection = ConnectionManager.getConnection();
             PreparedStatement preparedStatement = this.con.prepareStatement(query);
             preparedStatement.setString(1, data);
             ResultSet result = preparedStatement.executeQuery();
@@ -58,7 +78,8 @@ public class UserDatabase {
                 user.setDob(result.getString("dob"));
                 user.setGender(result.getString("gender"));
 
-                //decrypt password
+
+                //decrypting password
                 String decryptPass = Encryption.decryptPassword(result.getString("password"));
                 System.out.print("Decr: "+decryptPass);
                 System.out.print("password "+password);
@@ -70,5 +91,77 @@ public class UserDatabase {
         }
         return user;
     }
+
+
+    public User loadUser(String userEmail)
+    {
+        List<User> userList = new ArrayList<>();
+        User user=null;
+
+        try {
+             user =  new User();
+            String query = "select * from user where email=email";
+            Connection connection = ConnectionManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            //preparedStatement.setString(1, data);
+            ResultSet result = preparedStatement.executeQuery();
+
+           while(result.next())
+            {
+                user.setFirstname(result.getString("firstName"));
+                user.setLastname(result.getString("lastName"));
+                user.setPassword(result.getString("password"));
+                user.setEmail(result.getString("email"));
+                user.setDob(result.getString("dob"));
+                user.setGender(result.getString("gender"));
+                user.setId(result.getInt("id"));
+                user.setPassword(result.getString("password"));
+                if(user.getEmail().equals(userEmail)){
+
+                    break;
+                }
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return user;
+    }
+
+    public List<User> getUsers(){
+        User user = null;
+        List users = new ArrayList();
+
+        try {
+            String query = "select * from users";
+            PreparedStatement preparedStatement = this.con.prepareStatement(query);
+
+            ResultSet result = preparedStatement.executeQuery();
+            while(result.next()){
+                user = new User();
+
+                user.setId(result.getInt("id"));
+                user.setFirstname(result.getString("firstName"));
+                user.setLastname(result.getString("lastName"));
+                user.setPassword(result.getString("password"));
+                user.setEmail(result.getString("email"));
+
+                users.add(user);
+            }
+            return users;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
+
+
+
+//    public static void main(String[] args) {
+//        System.out.println(getUserById(1));
+//
+//    }
+
 }
 

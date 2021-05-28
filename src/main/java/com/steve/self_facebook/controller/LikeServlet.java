@@ -10,8 +10,8 @@ import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet(name = "CommentServlet", value = "/CommentServlet")
-public class CommentServlet extends HttpServlet {
+@WebServlet(name = "LikeServlet", value = "/LikeServlet")
+public class LikeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -24,33 +24,26 @@ public class CommentServlet extends HttpServlet {
             out.println("<h1>" + "Servlet Registration example" + "</h1>");
             out.println("</body></html>");
 
-
-
             HttpSession httpSession = request.getSession();
-
-
-            //Getting data from the form  post
-            String comment = request.getParameter("comment");
+            //fetch data from post form
+            int action = Integer.parseInt(request.getParameter("action"));
             int postId = Integer.parseInt(request.getParameter("postId"));
-            User currentUser = (User) httpSession.getAttribute("user");
-            int userId = currentUser.getId();
+//            int userId = Integer.parseInt(request.getParameter("userId"));
+            User user = (User) httpSession.getAttribute("user");
+
+            response.getWriter().write(action+postId+user.getId());
 
             PostDatabase postDatabase = new PostDatabase(ConnectionManager.getConnection());
 
-            if(postDatabase.makeComment(userId,postId,comment)){
-                out.println("File uploaded to this directory");
-                httpSession.setAttribute("message", "successful");
-                httpSession.setAttribute("user",currentUser);
+            if(postDatabase.likePost(user.getId(), postId, action)){
+                response.getWriter().write("Success liking/disliking post");
             }else{
                 out.print("500 error");
-                httpSession.setAttribute("message", "Error posting comment");
-                httpSession.setAttribute("user",currentUser);
+                response.getWriter().write("Failed do liking post");
             }
 
-            response.sendRedirect("home.jsp");
-
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }

@@ -29,7 +29,7 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         UserDatabase userData = new UserDatabase(ConnectionManager.getConnection());
-        User user = userData.logUser(email, password);
+        User user = userData.login(email, password);
 
         if(user != null){
             httpSession.setAttribute("user", user);

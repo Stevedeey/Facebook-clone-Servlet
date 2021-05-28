@@ -2,7 +2,6 @@ package com.steve.self_facebook.controller;
 
 import com.steve.self_facebook.DOA.PostDatabase;
 import com.steve.self_facebook.model.Post;
-import com.steve.self_facebook.model.User;
 import com.steve.self_facebook.utilities.ConnectionManager;
 
 import javax.servlet.*;
@@ -34,7 +33,7 @@ public class UpdateServlet extends HttpServlet {
             Post post = new Post(title, body);
             PostDatabase postDatabase = new PostDatabase(ConnectionManager.getConnection());
 
-            if (postDatabase.updatePost(postId, post)) {
+            if (postDatabase.editPost(postId, post)) {
                 out.println("File uploaded to this directory");
                 httpSession.setAttribute("message", "successful");
             } else {

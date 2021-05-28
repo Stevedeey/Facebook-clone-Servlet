@@ -1,7 +1,8 @@
-<%@ page import="com.steve.self_facebook.DOA.Comment" %>
+<%@ page import="com.steve.self_facebook.model.Comment" %>
 <%@ page import="com.steve.self_facebook.DOA.PostDatabase" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.steve.self_facebook.utilities.ConnectionManager" %><%--
+<%@ page import="com.steve.self_facebook.utilities.ConnectionManager" %>
+<%@ page import="com.steve.self_facebook.model.User" %><%--
   Created by IntelliJ IDEA.
   User: mac
   Date: 5/5/21
@@ -12,7 +13,7 @@
 
 <html>
 <head>
-  <title>Comment Facebook Post</title>
+  <title>Comment </title>
 
   <meta charset="utf-8" />
   <meta
@@ -40,7 +41,13 @@
   String query = request.getQueryString();
   int postId = Integer.parseInt(query.substring(query.indexOf("=")+1));
   PostDatabase postDatabase = new PostDatabase(ConnectionManager.getConnection());
-  List<Comment> commentList = postDatabase.getComments(postId);
+  List<Comment> commentList = postDatabase.getAllComments(postId);
+
+  User user = (User) session.getAttribute("user");
+  if(user == null){
+    session.setAttribute("Registration Error", "!!!Please Login first");
+    response.sendRedirect("index.jsp");
+  }
 %>
 <nav style="background: #3b5998" class="navbar navbar-expand-lg">
   <div class="container-fluid">
@@ -64,14 +71,51 @@
 <%--    <%}--%>
 <%--    %>--%>
 <section style="margin: 60px auto; width: 70%; border: 2px solid #3b5998; padding: 15px">
+<%--  <%--%>
+<%--    if(commentList.size() != 0){--%>
+<%--      for (Comment comment:commentList) {%>--%>
+<%--  <p><%=comment.getUsername() %> </p>--%>
+<%--  <h4> <p><%=comment.getTitle() %> </p></h4>--%>
+<%--  <p></p>--%>
+<%--  <p> <p><%=comment.getComment()%> </p></p>--%>
+<%--  <p></p>--%>
+<%--  <hr/>--%>
+<%--  <%}--%>
+<%--  }else{ %>--%>
+<%--  <h1>No Comments !!!!</h1>--%>
+<%--  <%}--%>
+<%--  %>--%>
+
   <%
-    if(commentList.size() != 0){
-      for (Comment comment:commentList) {%>
-  <p><%=comment.getUsername() %> </p>
-  <h4> <p><%=comment.getTitle() %> </p></h4>
-  <p></p>
-  <p> <p><%=comment.getComment()%> </p></p>
-  <p></p>
+    if(commentList.size() != 0){%>
+      <img src="./image/<%=commentList.get(0).getPostImage()%>" width="100%" height="60%"/>
+      <h3>Post Title: <%=commentList.get(0).getTitle() %></h3>
+      <%for (Comment comment:commentList) {%>
+      <hr/>
+      <h6>Name: <em><%=comment.getUsername()%> </em></h6>
+      <p><%=comment.getComment()%> </p>
+      <p><em>Edit Comment</em></p>
+      <textarea class="edit-comment"
+            placeholder="Edit comment here...<%= comment.getUsername() %>">
+                </textarea>
+
+        <button onclick="del(<%=postId%>, <%=comment.getUserId()%>)" class="btn btn-primary btn-md mt-3 btn-block"
+          <%
+
+            if(comment.getUserId() != user.getId()){%>
+          disabled
+
+          <%}%>>
+          Delete
+      </button>
+
+      <button onclick="edit(<%=postId%>, <%=comment.getUserId()%>)" class="btn btn-primary btn-md mt-3 btn-block"
+              <%
+                if(comment.getUserId() != user.getId()){%>
+              disabled
+              <%}%>>
+        Edit
+      </button>
   <hr/>
   <%}
   }else{ %>
@@ -81,9 +125,56 @@
 
 </section>
 <script>
-  window.onload = ()=> {
-    const params = new URLSearchParams(window.location.search);
-    document.getElementById("input").value =  params.get("post");
+  // window.onload = ()=> {
+  //   const params = new URLSearchParams(window.location.search);
+  //   document.getElementById("input").value =  params.get("post");
+  // }
+  function del(postId, userId){
+    const delCom = confirm("Are you sure you want to delete comment");
+
+    if(delCom){
+      $.ajax({
+        type: 'POST',
+        url: '/DeleteCommentServlet',
+        data: {"postId": postId, "userId":userId},
+
+        success: function(data){
+          alert(data);
+          window.location.reload();
+        },
+        error: function(){
+          alert('error deleting post');
+        }
+      });
+    }
+  }
+
+  function edit(postId, userId){
+
+    const editedComment = document.getElementsByClassName("edit-comment");
+
+    for (let i = 0; i < editedComment.length; i++){
+      let comment = editedComment[i].value.trim();
+      if(comment != ""){
+        const editPost = confirm("Are you sure you want to edit comment");
+
+        if(editPost){
+          $.ajax({
+            type: 'POST',
+            url: '/EditCommentServlet',
+            data: {"postId": postId, "userId":userId, "editedComment": comment},
+
+            success: function(data){
+              alert(data);
+              window.location.reload();
+            },
+            error: function(){
+              alert('error editing post');
+            }
+          });
+        }
+      }
+    }
   }
 </script>
 </body>

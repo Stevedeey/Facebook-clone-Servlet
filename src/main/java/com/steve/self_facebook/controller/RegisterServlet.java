@@ -45,7 +45,7 @@ public class RegisterServlet extends HttpServlet {
                 response.sendRedirect("index.jsp");
                 return;
             }
-            if (fname.length() < 3) {
+            if (lname.length() < 3) {
                 httpSession.setAttribute("Registration Error", "surname cannot be less than 3 character long");
                 response.sendRedirect("index.jsp");
                 return;
@@ -60,15 +60,16 @@ public class RegisterServlet extends HttpServlet {
 
             User user = new User(fname,lname,encryptedPass,email,dob,gender);
             UserDatabase userDatabase = new UserDatabase(ConnectionManager.getConnection());
-            if(userDatabase.saveUser(user)){
-                response.sendRedirect("index.jsp");
+
+
+            if (!userDatabase.registerUser(user)) {
+                String errorMessage = "User already exist!";
+                httpSession.setAttribute("Registration Error", errorMessage);
+            }else{
+                httpSession.setAttribute("Registration Error", "Successfully registered!");
             }
-            else{
-                String errorMessage = "User Available";
-                HttpSession regSession = request.getSession();
-                regSession.setAttribute("regError",errorMessage);
-                response.sendRedirect("register.jsp");
-            }
+
+            response.sendRedirect("index.jsp");
 
         }
         catch (Exception exception){

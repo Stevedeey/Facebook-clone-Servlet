@@ -29,11 +29,9 @@ public class PostServlet extends HttpServlet {
 
             HttpSession httpSession = request.getSession();
 
-            //fetch data from post form
+            //Getting data from the form post action
             Part part = request.getPart("file");
-
-           String imageName = part.getSubmittedFileName();
-
+            String imageName = part.getSubmittedFileName();
             String title = request.getParameter("title");
             String body = request.getParameter("body");
             User currentUser = (User) httpSession.getAttribute("user");
@@ -49,7 +47,7 @@ public class PostServlet extends HttpServlet {
             String path = "/Users/mac/IdeaProjects/facebook/src/main/webapp/image" + File.separator + imageName;
 
             InputStream in = part.getInputStream();
-            boolean success = uploadFile(in, path);
+            boolean success = putFile(in, path);
 
             if (success) {
                 Post post = new Post(title, body, imageName);
@@ -68,13 +66,13 @@ public class PostServlet extends HttpServlet {
             }
             response.sendRedirect("home.jsp");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+//            System.out.println(e.getMessage());
         }
     }
 
 
-    public boolean uploadFile(InputStream in, String path) {
-        boolean test = false;
+    public boolean putFile(InputStream in, String path) {
+        boolean flag = false;
 
         try {
             byte[] byt = new byte[in.available()];
@@ -83,10 +81,10 @@ public class PostServlet extends HttpServlet {
             fops.write(byt);
             fops.flush();
             fops.close();
-            test = true;
+            flag = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return test;
+        return flag;
    }
 }

@@ -6,8 +6,9 @@ html{
 }
 
 body{
-    background: #6985bd !important;
-    color: #fff;
+    /*background: #1b3e82 !important;*/
+    background: #f0f2f5 !important;
+    color: #000;
 }
 nav{
     background: #ddd !important;
@@ -37,7 +38,8 @@ nav{
 }
 .yourfeed{
     display: inline;
-    color: #fff;
+    /*color: #fff;*/
+    color: #000;
     margin-left: 20px;
 }
 .yourfeed1{
@@ -58,7 +60,7 @@ nav{
 
 .scroller {
     width: 100%;
-    height: 1000px;
+    height: 950px;
     overflow-y: scroll;
     /* scrollbar-color: rebeccapurple green; */
     scrollbar-width: thin;
@@ -90,33 +92,21 @@ input:focus {
 }
 /* Like area */
 .comment_like_share{
-
     display: flex;
-/align-items: space-around;/
+/align-items: space-around;
 padding-left: 90px;
 }
 .like{
     flex: 1;
-
-    /* margin-right: 30px;
-    display: inline-flex; */
 }
 .comment{
     flex: 1;
-
-    /* margin-right:30px; */
-    /* display: inline-flex; */
 }
 .edit{
     flex: 1;
-
-    /* display: inline-flex; */
 }
 .delete{
     flex: 1;
-
-    /* margin-right:30px;
-    display: inline-flex; */
 
 }
 .like span{
@@ -136,7 +126,7 @@ padding-left: 90px;
     width: 100%;
 }
 .postArea label{
-    color:white;
+    color:#000;
 }
 .third{
     color:black;
@@ -152,8 +142,8 @@ padding-left: 90px;
 }
 
 .titleText h2{
-    color: white;
-    font-family: cursive;
+    color: #000;
+    font-family: Helvetica;
     font-size: 2em;
 }
 
