@@ -65,6 +65,7 @@ public class PostServlet extends HttpServlet {
                 httpSession.setAttribute("message", "error uploading file");
             }
             response.sendRedirect("home.jsp");
+
         } catch (Exception e) {
 //            System.out.println(e.getMessage());
         }
